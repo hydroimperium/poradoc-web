@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PoraDoc — Персональный велнес-планер | Скачать APK</title>
+  <meta name="description" content="PoraDoc — персональный велнес-планер без облачной слежки. Медицинские документы, приемы лекарств и чекапы семьи на Android. Скачать APK.">
+  <meta property="og:title" content="PoraDoc — Персональный велнес-планер">
+  <meta property="og:description" content="Твои медицинские документы, приемы лекарств и чекапы семьи в одном спокойном приложении. Без облачной слежки.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hydroimperium.github.io/poradoc-web/">
+  <meta name="theme-color" content="#16A34A">
+
+  <script>document.documentElement.classList.add('has-js');</script>
+
+  <!-- Favicon SVG (Brand shield + medical cross) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 108 108'%3E%3Crect width='108' height='108' rx='28' fill='%2316A34A'/%3E%3Cpath fill='none' stroke='%23DCFCE7' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' d='M54,23 C68,23 81,32 81,50 C81,66 54,85 54,85 C54,85 27,66 27,50 C27,32 40,23 54,23 Z'/%3E%3Cpath fill='%23FFFFFF' d='M50,37 C50,34.8 51.8,33 54,33 C56.2,33 58,34.8 58,37 L58,47 L68,47 C70.2,47 72,48.8 72,51 C72,53.2 70.2,55 68,55 L58,55 L58,65 C58,67.2 56.2,69 54,69 C51.8,69 50,67.2 50,65 L50,55 L40,55 C37.8,55 36,53.2 36,51 C36,48.8 37.8,47 40,47 L50,47 Z'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pageBg: '#EEFBF3',
+            cardBorder: '#C8EED7',
+            cardBorderHover: '#86EFAC',
+            primary: {
+              DEFAULT: '#16A34A',
+              dark: '#15803D',
+              hover: '#15803D',
+              light: '#22C55E',
+              vibrant: '#10B981',
+            },
+            primaryContainer: '#D1FAE5',
+            primaryContainerLight: '#ECFDF5',
+            textHeadline: '#062E16',
+            textSecondary: '#2D5A3C',
+          },
+          fontFamily: {
+            sans: ['Manrope', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          borderRadius: {
+            '24': '24px',
+          },
+          boxShadow: {
+            'wellness': '0 8px 24px -4px rgba(16, 185, 129, 0.08), 0 2px 6px -1px rgba(6, 46, 22, 0.04)',
+            'wellness-hover': '0 16px 36px -4px rgba(16, 185, 129, 0.22), 0 4px 14px -2px rgba(34, 197, 94, 0.12)',
+            'button': '0 8px 26px -2px rgba(22, 163, 74, 0.45), 0 3px 10px rgba(34, 197, 94, 0.35)',
+            'button-hover': '0 12px 32px 0 rgba(22, 163, 74, 0.55), 0 4px 14px rgba(34, 197, 94, 0.45)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- QRCode.js via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    /* CSS Variables & Fallbacks */
+    :root {
+      --bg-page: #EEFBF3;
+      --card-border: #C8EED7;
+      --card-border-hover: #86EFAC;
+      --primary: #16A34A;
+      --primary-hover: #15803D;
+      --primary-vibrant: #10B981;
+      --primary-container: #D1FAE5;
+      --text-headline: #062E16;
+      --text-secondary: #2D5A3C;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      background-image: 
+        radial-gradient(at 10% 12%, rgba(134, 239, 172, 0.6) 0px, transparent 48%),
+        radial-gradient(at 90% 10%, rgba(167, 243, 208, 0.7) 0px, transparent 50%),
+        radial-gradient(at 50% 38%, rgba(209, 250, 229, 0.65) 0px, transparent 55%),
+        radial-gradient(at 85% 72%, rgba(110, 231, 183, 0.55) 0px, transparent 50%),
+        radial-gradient(at 15% 85%, rgba(187, 247, 208, 0.65) 0px, transparent 55%);
+      background-attachment: fixed;
+      color: var(--text-headline);
+      font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Pastel bright-green wellness card styling */
+    .wellness-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 253, 244, 0.92) 55%, rgba(220, 252, 231, 0.7) 100%);
+      border: 1px solid #C8EED7;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.08), 0 2px 6px -1px rgba(6, 46, 22, 0.04);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .wellness-card:hover {
+      border-color: #86EFAC;
+      box-shadow: 0 16px 36px -4px rgba(16, 185, 129, 0.22), 0 4px 14px -2px rgba(34, 197, 94, 0.12);
+      transform: translateY(-3px);
+    }
+
+    /* Scroll animations with progressive enhancement */
+    .has-js .reveal-item {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+
+    .has-js .reveal-item.is-revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .has-js .reveal-item {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+      .scroll-smooth {
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Smooth accordion animation using robust CSS Grid pattern */
+    .accordion-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .accordion-body.open {
+      grid-template-rows: 1fr;
+    }
+
+    .accordion-wrapper {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* Soft focus rings */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 3px;
+    }
+
+    /* QR Code Canvas centering */
+    #qrcode canvas, #qrcode svg {
+      margin: 0 auto;
+      border-radius: 12px;
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+
+<body class="bg-pageBg text-textHeadline antialiased selection:bg-primaryContainer selection:text-textHeadline min-h-screen flex flex-col">
+
+  <!-- ======================================================== -->
+  <!-- БЛОК 1. МИНИМАЛИСТИЧНАЯ ШАПКА (HEADER)                   -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-50 bg-pageBg/90 backdrop-blur-md border-b border-cardBorder transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
+      
+      <!-- Слева: Логотип + Название + Бейдж v1.0 -->
+      <a href="#" class="flex items-center gap-2 sm:gap-3 group focus:outline-none flex-shrink-0" aria-label="PoraDoc — на главную">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-primary flex items-center justify-center text-white shadow-sm shadow-primary/20 transition-transform duration-300 group-hover:scale-105 flex-shrink-0">
+          <!-- Authentic PoraDoc Shield & Medical Cross SVG -->
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" viewBox="0 0 108 108" fill="none" stroke="currentColor">
+            <path stroke="#DCFCE7" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" d="M54,23 C68,23 81,32 81,50 C81,66 54,85 54,85 C54,85 27,66 27,50 C27,32 40,23 54,23 Z" />
+            <path fill="#FFFFFF" stroke="none" d="M50,37 C50,34.8 51.8,33 54,33 C56.2,33 58,34.8 58,37 L58,47 L68,47 C70.2,47 72,48.8 72,51 C72,53.2 70.2,55 68,55 L58,55 L58,65 C58,67.2 56.2,69 54,69 C51.8,69 50,67.2 50,65 L50,55 L40,55 C37.8,55 36,53.2 36,51 C36,48.8 37.8,47 40,47 L50,47 Z" />
+          </svg>
+        </div>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <span class="text-lg sm:text-2xl font-extrabold tracking-tight text-textHeadline">PoraDoc</span>
+          <span class="px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full bg-primaryContainer text-textHeadline border border-[#A7F3D0]">v1.0</span>
+        </div>
+      </a>
+
+      <!-- Справа: Ссылка на GitHub -->
+      <nav class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0" aria-label="Быстрая навигация">
+        <a href="https://github.com/hydroimperium/poradoc-web" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-textHeadline bg-white/90 hover:bg-white border border-cardBorder hover:border-[#A7F3D0] shadow-sm transition-all duration-200 flex items-center gap-2 hover:-translate-y-0.5" aria-label="GitHub репозиторий hydroimperium/poradoc-web">
+          <!-- GitHub Octocat SVG -->
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 fill-current flex-shrink-0" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span class="text-xs font-bold">GitHub</span>
+        </a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="flex-grow">
+
+    <!-- ======================================================== -->
+    <!-- БЛОК 2. ГЛАВНЫЙ ЭКРАН (HERO SECTION)                     -->
+    <!-- ======================================================== -->
+    <section class="relative pt-8 sm:pt-16 pb-14 sm:pb-24 overflow-hidden">
+      <!-- Subtle ambient pastel green glowing orbs in background -->
+      <div class="absolute top-1/4 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[400px] bg-emerald-200/40 rounded-full blur-3xl pointer-events-none -z-10" aria-hidden="true"></div>
+      <div class="absolute top-1/3 right-1/4 w-[450px] h-[350px] bg-green-200/50 rounded-full blur-3xl pointer-events-none -z-10" aria-hidden="true"></div>
+
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
+          
+          <!-- Левая колонка: Текст и скачивание (Hero Content) -->
+          <div class="lg:col-span-7 flex flex-col items-start text-left reveal-item">
+            
+            <!-- Бейдж над заголовком -->
+            <div class="inline-flex items-center flex-wrap gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-emerald-100/90 border border-emerald-300 text-textHeadline text-xs sm:text-sm font-semibold mb-6 leading-snug max-w-full shadow-sm">
+              <!-- Leaf / shield micro-icon -->
+              <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span>Персональный велнес-планер • Без облачной слежки</span>
+            </div>
+
+            <!-- Крупный заголовок -->
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-textHeadline tracking-tight leading-[1.15] sm:leading-[1.12] mb-6 break-words">
+              Пора навести <span class="text-emerald-600 relative inline-block">
+                PoraDoc
+                <svg class="absolute -bottom-1 left-0 w-full h-2.5 text-emerald-300 -z-10" viewBox="0 0 100 20" preserveAspectRatio="none">
+                  <path d="M0,15 Q50,0 100,15" stroke="currentColor" stroke-width="12" fill="none" stroke-linecap="round"/>
+                </svg>
+              </span> в здоровье
+            </h1>
+
+            <!-- Подзаголовок -->
+            <p class="text-base sm:text-xl text-textSecondary font-normal leading-relaxed mb-8 max-w-xl">
+              Твои медицинские документы, приемы лекарств и чекапы семьи в одном спокойном приложении. Все данные хранятся локально на твоем телефоне.
+            </p>
+
+            <!-- Блок скачивания -->
+            <div class="w-full sm:w-auto flex flex-col items-start gap-3">
+              <a href="https://github.com/hydroimperium/poradoc-web/releases/latest/download/PoraDoc.apk"
+                 class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-7 sm:px-9 py-4 sm:py-4.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-green-600 to-emerald-600 hover:from-emerald-400 hover:via-green-500 hover:to-emerald-500 text-white text-base sm:text-lg font-extrabold shadow-button hover:shadow-button-hover hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 group focus:outline-none"
+                 download="PoraDoc.apk">
+                <!-- Android Icon -->
+                <svg class="w-6 h-6 fill-current flex-shrink-0" viewBox="0 0 24 24">
+                  <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-1.0003 0-.5517.4482-1.0002.9993-1.0002.5517 0 .9996.4485.9996 1.0002 0 .5517-.4479 1.0003-.9996 1.0003m-11.046 0c-.5511 0-.9993-.4486-.9993-1.0003 0-.5517.4482-1.0002.9993-1.0002.5517 0 .9996.4485.9996 1.0002 0 .5517-.4479 1.0003-.9996 1.0003m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.136 12 8.136c-1.8533 0-3.5902.2756-5.1368.8137L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
+                </svg>
+                <span>Скачать PoraDoc.apk</span>
+                <!-- Download arrow icon -->
+                <svg class="w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </a>
+
+              <!-- Подпись под кнопкой -->
+              <p class="text-xs sm:text-sm text-textSecondary font-medium flex items-center gap-1.5 flex-wrap">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>Версия 1.0 • Android 8.0 и новее • Бесплатно</span>
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Правая колонка: Стильный QR-код для десктопа и быстрого старта -->
+          <div class="lg:col-span-5 reveal-item">
+            <div class="wellness-card rounded-24 p-5 sm:p-8 text-center relative overflow-hidden max-w-sm mx-auto lg:max-w-none">
+              
+              <!-- Заголовок карточки QR -->
+              <div class="mb-4">
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 border border-emerald-200 mb-2">
+                  Быстрый старт
+                </span>
+                <h2 class="text-base sm:text-lg font-bold text-textHeadline">
+                  Скачать прямо на смартфон
+                </h2>
+              </div>
+
+              <!-- Контейнер QR-кода -->
+              <div class="relative mx-auto w-48 h-48 sm:w-52 sm:h-52 bg-white/90 p-3 sm:p-3.5 rounded-2xl border border-emerald-200/80 shadow-inner flex items-center justify-center">
+                <!-- QR target rendered via JS / clean inline SVG -->
+                <div id="qrcode" class="flex items-center justify-center">
+                  <svg id="qr-svg" class="w-40 h-40 sm:w-44 sm:h-44 object-contain rounded-xl" xmlns="http://www.w3.org/2000/svg" version="1.1" width="180" height="180" viewBox="0 0 37 37"> <desc>https://github.com/hydroimperium/poradoc-web/releases/latest/download/PoraDoc.apk</desc> <rect style="fill:rgb(255, 255, 255);fill-opacity:1" x="0" y="0" width="37" height="37" /> <g id="elements"> <path style="fill:rgb(20, 46, 27)" d="M 0,0 l 1,0 0,1 -1,0 z M 1,0 l 1,0 0,1 -1,0 z M 2,0 l 1,0 0,1 -1,0 z M 3,0 l 1,0 0,1 -1,0 z M 4,0 l 1,0 0,1 -1,0 z M 5,0 l 1,0 0,1 -1,0 z M 6,0 l 1,0 0,1 -1,0 z M 9,0 l 1,0 0,1 -1,0 z M 15,0 l 1,0 0,1 -1,0 z M 16,0 l 1,0 0,1 -1,0 z M 18,0 l 1,0 0,1 -1,0 z M 19,0 l 1,0 0,1 -1,0 z M 20,0 l 1,0 0,1 -1,0 z M 21,0 l 1,0 0,1 -1,0 z M 22,0 l 1,0 0,1 -1,0 z M 23,0 l 1,0 0,1 -1,0 z M 25,0 l 1,0 0,1 -1,0 z M 30,0 l 1,0 0,1 -1,0 z M 31,0 l 1,0 0,1 -1,0 z M 32,0 l 1,0 0,1 -1,0 z M 33,0 l 1,0 0,1 -1,0 z M 34,0 l 1,0 0,1 -1,0 z M 35,0 l 1,0 0,1 -1,0 z M 36,0 l 1,0 0,1 -1,0 z M 0,1 l 1,0 0,1 -1,0 z M 6,1 l 1,0 0,1 -1,0 z M 8,1 l 1,0 0,1 -1,0 z M 9,1 l 1,0 0,1 -1,0 z M 11,1 l 1,0 0,1 -1,0 z M 12,1 l 1,0 0,1 -1,0 z M 20,1 l 1,0 0,1 -1,0 z M 25,1 l 1,0 0,1 -1,0 z M 26,1 l 1,0 0,1 -1,0 z M 27,1 l 1,0 0,1 -1,0 z M 28,1 l 1,0 0,1 -1,0 z M 30,1 l 1,0 0,1 -1,0 z M 36,1 l 1,0 0,1 -1,0 z M 0,2 l 1,0 0,1 -1,0 z M 2,2 l 1,0 0,1 -1,0 z M 3,2 l 1,0 0,1 -1,0 z M 4,2 l 1,0 0,1 -1,0 z M 6,2 l 1,0 0,1 -1,0 z M 9,2 l 1,0 0,1 -1,0 z M 10,2 l 1,0 0,1 -1,0 z M 11,2 l 1,0 0,1 -1,0 z M 14,2 l 1,0 0,1 -1,0 z M 16,2 l 1,0 0,1 -1,0 z M 18,2 l 1,0 0,1 -1,0 z M 21,2 l 1,0 0,1 -1,0 z M 22,2 l 1,0 0,1 -1,0 z M 24,2 l 1,0 0,1 -1,0 z M 26,2 l 1,0 0,1 -1,0 z M 27,2 l 1,0 0,1 -1,0 z M 28,2 l 1,0 0,1 -1,0 z M 30,2 l 1,0 0,1 -1,0 z M 32,2 l 1,0 0,1 -1,0 z M 33,2 l 1,0 0,1 -1,0 z M 34,2 l 1,0 0,1 -1,0 z M 36,2 l 1,0 0,1 -1,0 z M 0,3 l 1,0 0,1 -1,0 z M 2,3 l 1,0 0,1 -1,0 z M 3,3 l 1,0 0,1 -1,0 z M 4,3 l 1,0 0,1 -1,0 z M 6,3 l 1,0 0,1 -1,0 z M 8,3 l 1,0 0,1 -1,0 z M 9,3 l 1,0 0,1 -1,0 z M 11,3 l 1,0 0,1 -1,0 z M 16,3 l 1,0 0,1 -1,0 z M 17,3 l 1,0 0,1 -1,0 z M 18,3 l 1,0 0,1 -1,0 z M 22,3 l 1,0 0,1 -1,0 z M 24,3 l 1,0 0,1 -1,0 z M 25,3 l 1,0 0,1 -1,0 z M 26,3 l 1,0 0,1 -1,0 z M 30,3 l 1,0 0,1 -1,0 z M 32,3 l 1,0 0,1 -1,0 z M 33,3 l 1,0 0,1 -1,0 z M 34,3 l 1,0 0,1 -1,0 z M 36,3 l 1,0 0,1 -1,0 z M 0,4 l 1,0 0,1 -1,0 z M 2,4 l 1,0 0,1 -1,0 z M 3,4 l 1,0 0,1 -1,0 z M 4,4 l 1,0 0,1 -1,0 z M 6,4 l 1,0 0,1 -1,0 z M 10,4 l 1,0 0,1 -1,0 z M 12,4 l 1,0 0,1 -1,0 z M 13,4 l 1,0 0,1 -1,0 z M 14,4 l 1,0 0,1 -1,0 z M 15,4 l 1,0 0,1 -1,0 z M 17,4 l 1,0 0,1 -1,0 z M 18,4 l 1,0 0,1 -1,0 z M 19,4 l 1,0 0,1 -1,0 z M 20,4 l 1,0 0,1 -1,0 z M 21,4 l 1,0 0,1 -1,0 z M 23,4 l 1,0 0,1 -1,0 z M 26,4 l 1,0 0,1 -1,0 z M 28,4 l 1,0 0,1 -1,0 z M 30,4 l 1,0 0,1 -1,0 z M 32,4 l 1,0 0,1 -1,0 z M 33,4 l 1,0 0,1 -1,0 z M 34,4 l 1,0 0,1 -1,0 z M 36,4 l 1,0 0,1 -1,0 z M 0,5 l 1,0 0,1 -1,0 z M 6,5 l 1,0 0,1 -1,0 z M 8,5 l 1,0 0,1 -1,0 z M 10,5 l 1,0 0,1 -1,0 z M 13,5 l 1,0 0,1 -1,0 z M 14,5 l 1,0 0,1 -1,0 z M 15,5 l 1,0 0,1 -1,0 z M 16,5 l 1,0 0,1 -1,0 z M 17,5 l 1,0 0,1 -1,0 z M 20,5 l 1,0 0,1 -1,0 z M 21,5 l 1,0 0,1 -1,0 z M 22,5 l 1,0 0,1 -1,0 z M 27,5 l 1,0 0,1 -1,0 z M 28,5 l 1,0 0,1 -1,0 z M 30,5 l 1,0 0,1 -1,0 z M 36,5 l 1,0 0,1 -1,0 z M 0,6 l 1,0 0,1 -1,0 z M 1,6 l 1,0 0,1 -1,0 z M 2,6 l 1,0 0,1 -1,0 z M 3,6 l 1,0 0,1 -1,0 z M 4,6 l 1,0 0,1 -1,0 z M 5,6 l 1,0 0,1 -1,0 z M 6,6 l 1,0 0,1 -1,0 z M 8,6 l 1,0 0,1 -1,0 z M 10,6 l 1,0 0,1 -1,0 z M 12,6 l 1,0 0,1 -1,0 z M 14,6 l 1,0 0,1 -1,0 z M 16,6 l 1,0 0,1 -1,0 z M 18,6 l 1,0 0,1 -1,0 z M 20,6 l 1,0 0,1 -1,0 z M 22,6 l 1,0 0,1 -1,0 z M 24,6 l 1,0 0,1 -1,0 z M 26,6 l 1,0 0,1 -1,0 z M 28,6 l 1,0 0,1 -1,0 z M 30,6 l 1,0 0,1 -1,0 z M 31,6 l 1,0 0,1 -1,0 z M 32,6 l 1,0 0,1 -1,0 z M 33,6 l 1,0 0,1 -1,0 z M 34,6 l 1,0 0,1 -1,0 z M 35,6 l 1,0 0,1 -1,0 z M 36,6 l 1,0 0,1 -1,0 z M 12,7 l 1,0 0,1 -1,0 z M 13,7 l 1,0 0,1 -1,0 z M 15,7 l 1,0 0,1 -1,0 z M 19,7 l 1,0 0,1 -1,0 z M 20,7 l 1,0 0,1 -1,0 z M 21,7 l 1,0 0,1 -1,0 z M 22,7 l 1,0 0,1 -1,0 z M 27,7 l 1,0 0,1 -1,0 z M 28,7 l 1,0 0,1 -1,0 z M 0,8 l 1,0 0,1 -1,0 z M 1,8 l 1,0 0,1 -1,0 z M 2,8 l 1,0 0,1 -1,0 z M 3,8 l 1,0 0,1 -1,0 z M 4,8 l 1,0 0,1 -1,0 z M 6,8 l 1,0 0,1 -1,0 z M 7,8 l 1,0 0,1 -1,0 z M 8,8 l 1,0 0,1 -1,0 z M 9,8 l 1,0 0,1 -1,0 z M 10,8 l 1,0 0,1 -1,0 z M 12,8 l 1,0 0,1 -1,0 z M 14,8 l 1,0 0,1 -1,0 z M 15,8 l 1,0 0,1 -1,0 z M 19,8 l 1,0 0,1 -1,0 z M 22,8 l 1,0 0,1 -1,0 z M 24,8 l 1,0 0,1 -1,0 z M 25,8 l 1,0 0,1 -1,0 z M 26,8 l 1,0 0,1 -1,0 z M 27,8 l 1,0 0,1 -1,0 z M 28,8 l 1,0 0,1 -1,0 z M 29,8 l 1,0 0,1 -1,0 z M 31,8 l 1,0 0,1 -1,0 z M 33,8 l 1,0 0,1 -1,0 z M 35,8 l 1,0 0,1 -1,0 z M 4,9 l 1,0 0,1 -1,0 z M 5,9 l 1,0 0,1 -1,0 z M 9,9 l 1,0 0,1 -1,0 z M 15,9 l 1,0 0,1 -1,0 z M 16,9 l 1,0 0,1 -1,0 z M 19,9 l 1,0 0,1 -1,0 z M 20,9 l 1,0 0,1 -1,0 z M 21,9 l 1,0 0,1 -1,0 z M 22,9 l 1,0 0,1 -1,0 z M 23,9 l 1,0 0,1 -1,0 z M 25,9 l 1,0 0,1 -1,0 z M 28,9 l 1,0 0,1 -1,0 z M 33,9 l 1,0 0,1 -1,0 z M 34,9 l 1,0 0,1 -1,0 z M 35,9 l 1,0 0,1 -1,0 z M 0,10 l 1,0 0,1 -1,0 z M 2,10 l 1,0 0,1 -1,0 z M 3,10 l 1,0 0,1 -1,0 z M 4,10 l 1,0 0,1 -1,0 z M 6,10 l 1,0 0,1 -1,0 z M 7,10 l 1,0 0,1 -1,0 z M 11,10 l 1,0 0,1 -1,0 z M 12,10 l 1,0 0,1 -1,0 z M 18,10 l 1,0 0,1 -1,0 z M 24,10 l 1,0 0,1 -1,0 z M 25,10 l 1,0 0,1 -1,0 z M 26,10 l 1,0 0,1 -1,0 z M 27,10 l 1,0 0,1 -1,0 z M 28,10 l 1,0 0,1 -1,0 z M 29,10 l 1,0 0,1 -1,0 z M 31,10 l 1,0 0,1 -1,0 z M 33,10 l 1,0 0,1 -1,0 z M 34,10 l 1,0 0,1 -1,0 z M 36,10 l 1,0 0,1 -1,0 z M 1,11 l 1,0 0,1 -1,0 z M 2,11 l 1,0 0,1 -1,0 z M 3,11 l 1,0 0,1 -1,0 z M 4,11 l 1,0 0,1 -1,0 z M 5,11 l 1,0 0,1 -1,0 z M 8,11 l 1,0 0,1 -1,0 z M 11,11 l 1,0 0,1 -1,0 z M 14,11 l 1,0 0,1 -1,0 z M 16,11 l 1,0 0,1 -1,0 z M 18,11 l 1,0 0,1 -1,0 z M 20,11 l 1,0 0,1 -1,0 z M 21,11 l 1,0 0,1 -1,0 z M 22,11 l 1,0 0,1 -1,0 z M 26,11 l 1,0 0,1 -1,0 z M 27,11 l 1,0 0,1 -1,0 z M 29,11 l 1,0 0,1 -1,0 z M 31,11 l 1,0 0,1 -1,0 z M 32,11 l 1,0 0,1 -1,0 z M 33,11 l 1,0 0,1 -1,0 z M 35,11 l 1,0 0,1 -1,0 z M 0,12 l 1,0 0,1 -1,0 z M 1,12 l 1,0 0,1 -1,0 z M 2,12 l 1,0 0,1 -1,0 z M 3,12 l 1,0 0,1 -1,0 z M 5,12 l 1,0 0,1 -1,0 z M 6,12 l 1,0 0,1 -1,0 z M 7,12 l 1,0 0,1 -1,0 z M 9,12 l 1,0 0,1 -1,0 z M 10,12 l 1,0 0,1 -1,0 z M 11,12 l 1,0 0,1 -1,0 z M 16,12 l 1,0 0,1 -1,0 z M 17,12 l 1,0 0,1 -1,0 z M 19,12 l 1,0 0,1 -1,0 z M 23,12 l 1,0 0,1 -1,0 z M 24,12 l 1,0 0,1 -1,0 z M 25,12 l 1,0 0,1 -1,0 z M 26,12 l 1,0 0,1 -1,0 z M 29,12 l 1,0 0,1 -1,0 z M 30,12 l 1,0 0,1 -1,0 z M 32,12 l 1,0 0,1 -1,0 z M 33,12 l 1,0 0,1 -1,0 z M 34,12 l 1,0 0,1 -1,0 z M 36,12 l 1,0 0,1 -1,0 z M 2,13 l 1,0 0,1 -1,0 z M 4,13 l 1,0 0,1 -1,0 z M 7,13 l 1,0 0,1 -1,0 z M 8,13 l 1,0 0,1 -1,0 z M 10,13 l 1,0 0,1 -1,0 z M 12,13 l 1,0 0,1 -1,0 z M 13,13 l 1,0 0,1 -1,0 z M 14,13 l 1,0 0,1 -1,0 z M 15,13 l 1,0 0,1 -1,0 z M 17,13 l 1,0 0,1 -1,0 z M 18,13 l 1,0 0,1 -1,0 z M 19,13 l 1,0 0,1 -1,0 z M 20,13 l 1,0 0,1 -1,0 z M 23,13 l 1,0 0,1 -1,0 z M 26,13 l 1,0 0,1 -1,0 z M 28,13 l 1,0 0,1 -1,0 z M 31,13 l 1,0 0,1 -1,0 z M 34,13 l 1,0 0,1 -1,0 z M 35,13 l 1,0 0,1 -1,0 z M 1,14 l 1,0 0,1 -1,0 z M 2,14 l 1,0 0,1 -1,0 z M 3,14 l 1,0 0,1 -1,0 z M 6,14 l 1,0 0,1 -1,0 z M 8,14 l 1,0 0,1 -1,0 z M 10,14 l 1,0 0,1 -1,0 z M 13,14 l 1,0 0,1 -1,0 z M 14,14 l 1,0 0,1 -1,0 z M 15,14 l 1,0 0,1 -1,0 z M 16,14 l 1,0 0,1 -1,0 z M 17,14 l 1,0 0,1 -1,0 z M 22,14 l 1,0 0,1 -1,0 z M 25,14 l 1,0 0,1 -1,0 z M 27,14 l 1,0 0,1 -1,0 z M 31,14 l 1,0 0,1 -1,0 z M 32,14 l 1,0 0,1 -1,0 z M 34,14 l 1,0 0,1 -1,0 z M 35,14 l 1,0 0,1 -1,0 z M 36,14 l 1,0 0,1 -1,0 z M 0,15 l 1,0 0,1 -1,0 z M 4,15 l 1,0 0,1 -1,0 z M 5,15 l 1,0 0,1 -1,0 z M 7,15 l 1,0 0,1 -1,0 z M 9,15 l 1,0 0,1 -1,0 z M 12,15 l 1,0 0,1 -1,0 z M 13,15 l 1,0 0,1 -1,0 z M 15,15 l 1,0 0,1 -1,0 z M 19,15 l 1,0 0,1 -1,0 z M 20,15 l 1,0 0,1 -1,0 z M 21,15 l 1,0 0,1 -1,0 z M 22,15 l 1,0 0,1 -1,0 z M 30,15 l 1,0 0,1 -1,0 z M 31,15 l 1,0 0,1 -1,0 z M 32,15 l 1,0 0,1 -1,0 z M 33,15 l 1,0 0,1 -1,0 z M 36,15 l 1,0 0,1 -1,0 z M 0,16 l 1,0 0,1 -1,0 z M 2,16 l 1,0 0,1 -1,0 z M 4,16 l 1,0 0,1 -1,0 z M 6,16 l 1,0 0,1 -1,0 z M 8,16 l 1,0 0,1 -1,0 z M 12,16 l 1,0 0,1 -1,0 z M 14,16 l 1,0 0,1 -1,0 z M 15,16 l 1,0 0,1 -1,0 z M 17,16 l 1,0 0,1 -1,0 z M 19,16 l 1,0 0,1 -1,0 z M 22,16 l 1,0 0,1 -1,0 z M 24,16 l 1,0 0,1 -1,0 z M 25,16 l 1,0 0,1 -1,0 z M 26,16 l 1,0 0,1 -1,0 z M 27,16 l 1,0 0,1 -1,0 z M 28,16 l 1,0 0,1 -1,0 z M 29,16 l 1,0 0,1 -1,0 z M 30,16 l 1,0 0,1 -1,0 z M 32,16 l 1,0 0,1 -1,0 z M 33,16 l 1,0 0,1 -1,0 z M 34,16 l 1,0 0,1 -1,0 z M 36,16 l 1,0 0,1 -1,0 z M 0,17 l 1,0 0,1 -1,0 z M 5,17 l 1,0 0,1 -1,0 z M 8,17 l 1,0 0,1 -1,0 z M 9,17 l 1,0 0,1 -1,0 z M 10,17 l 1,0 0,1 -1,0 z M 15,17 l 1,0 0,1 -1,0 z M 16,17 l 1,0 0,1 -1,0 z M 19,17 l 1,0 0,1 -1,0 z M 20,17 l 1,0 0,1 -1,0 z M 23,17 l 1,0 0,1 -1,0 z M 28,17 l 1,0 0,1 -1,0 z M 29,17 l 1,0 0,1 -1,0 z M 31,17 l 1,0 0,1 -1,0 z M 34,17 l 1,0 0,1 -1,0 z M 35,17 l 1,0 0,1 -1,0 z M 0,18 l 1,0 0,1 -1,0 z M 3,18 l 1,0 0,1 -1,0 z M 6,18 l 1,0 0,1 -1,0 z M 9,18 l 1,0 0,1 -1,0 z M 11,18 l 1,0 0,1 -1,0 z M 12,18 l 1,0 0,1 -1,0 z M 17,18 l 1,0 0,1 -1,0 z M 18,18 l 1,0 0,1 -1,0 z M 20,18 l 1,0 0,1 -1,0 z M 21,18 l 1,0 0,1 -1,0 z M 22,18 l 1,0 0,1 -1,0 z M 24,18 l 1,0 0,1 -1,0 z M 27,18 l 1,0 0,1 -1,0 z M 28,18 l 1,0 0,1 -1,0 z M 31,18 l 1,0 0,1 -1,0 z M 32,18 l 1,0 0,1 -1,0 z M 34,18 l 1,0 0,1 -1,0 z M 35,18 l 1,0 0,1 -1,0 z M 36,18 l 1,0 0,1 -1,0 z M 0,19 l 1,0 0,1 -1,0 z M 1,19 l 1,0 0,1 -1,0 z M 2,19 l 1,0 0,1 -1,0 z M 3,19 l 1,0 0,1 -1,0 z M 5,19 l 1,0 0,1 -1,0 z M 8,19 l 1,0 0,1 -1,0 z M 9,19 l 1,0 0,1 -1,0 z M 11,19 l 1,0 0,1 -1,0 z M 14,19 l 1,0 0,1 -1,0 z M 16,19 l 1,0 0,1 -1,0 z M 18,19 l 1,0 0,1 -1,0 z M 19,19 l 1,0 0,1 -1,0 z M 20,19 l 1,0 0,1 -1,0 z M 21,19 l 1,0 0,1 -1,0 z M 23,19 l 1,0 0,1 -1,0 z M 24,19 l 1,0 0,1 -1,0 z M 26,19 l 1,0 0,1 -1,0 z M 27,19 l 1,0 0,1 -1,0 z M 28,19 l 1,0 0,1 -1,0 z M 29,19 l 1,0 0,1 -1,0 z M 30,19 l 1,0 0,1 -1,0 z M 36,19 l 1,0 0,1 -1,0 z M 1,20 l 1,0 0,1 -1,0 z M 3,20 l 1,0 0,1 -1,0 z M 4,20 l 1,0 0,1 -1,0 z M 5,20 l 1,0 0,1 -1,0 z M 6,20 l 1,0 0,1 -1,0 z M 7,20 l 1,0 0,1 -1,0 z M 8,20 l 1,0 0,1 -1,0 z M 10,20 l 1,0 0,1 -1,0 z M 11,20 l 1,0 0,1 -1,0 z M 17,20 l 1,0 0,1 -1,0 z M 20,20 l 1,0 0,1 -1,0 z M 22,20 l 1,0 0,1 -1,0 z M 25,20 l 1,0 0,1 -1,0 z M 26,20 l 1,0 0,1 -1,0 z M 27,20 l 1,0 0,1 -1,0 z M 29,20 l 1,0 0,1 -1,0 z M 30,20 l 1,0 0,1 -1,0 z M 32,20 l 1,0 0,1 -1,0 z M 33,20 l 1,0 0,1 -1,0 z M 34,20 l 1,0 0,1 -1,0 z M 35,20 l 1,0 0,1 -1,0 z M 36,20 l 1,0 0,1 -1,0 z M 0,21 l 1,0 0,1 -1,0 z M 1,21 l 1,0 0,1 -1,0 z M 2,21 l 1,0 0,1 -1,0 z M 3,21 l 1,0 0,1 -1,0 z M 9,21 l 1,0 0,1 -1,0 z M 12,21 l 1,0 0,1 -1,0 z M 13,21 l 1,0 0,1 -1,0 z M 14,21 l 1,0 0,1 -1,0 z M 15,21 l 1,0 0,1 -1,0 z M 18,21 l 1,0 0,1 -1,0 z M 19,21 l 1,0 0,1 -1,0 z M 20,21 l 1,0 0,1 -1,0 z M 21,21 l 1,0 0,1 -1,0 z M 23,21 l 1,0 0,1 -1,0 z M 28,21 l 1,0 0,1 -1,0 z M 31,21 l 1,0 0,1 -1,0 z M 35,21 l 1,0 0,1 -1,0 z M 0,22 l 1,0 0,1 -1,0 z M 1,22 l 1,0 0,1 -1,0 z M 3,22 l 1,0 0,1 -1,0 z M 5,22 l 1,0 0,1 -1,0 z M 6,22 l 1,0 0,1 -1,0 z M 8,22 l 1,0 0,1 -1,0 z M 9,22 l 1,0 0,1 -1,0 z M 13,22 l 1,0 0,1 -1,0 z M 14,22 l 1,0 0,1 -1,0 z M 15,22 l 1,0 0,1 -1,0 z M 16,22 l 1,0 0,1 -1,0 z M 18,22 l 1,0 0,1 -1,0 z M 20,22 l 1,0 0,1 -1,0 z M 21,22 l 1,0 0,1 -1,0 z M 26,22 l 1,0 0,1 -1,0 z M 27,22 l 1,0 0,1 -1,0 z M 29,22 l 1,0 0,1 -1,0 z M 30,22 l 1,0 0,1 -1,0 z M 32,22 l 1,0 0,1 -1,0 z M 34,22 l 1,0 0,1 -1,0 z M 35,22 l 1,0 0,1 -1,0 z M 36,22 l 1,0 0,1 -1,0 z M 0,23 l 1,0 0,1 -1,0 z M 1,23 l 1,0 0,1 -1,0 z M 2,23 l 1,0 0,1 -1,0 z M 3,23 l 1,0 0,1 -1,0 z M 7,23 l 1,0 0,1 -1,0 z M 9,23 l 1,0 0,1 -1,0 z M 12,23 l 1,0 0,1 -1,0 z M 13,23 l 1,0 0,1 -1,0 z M 19,23 l 1,0 0,1 -1,0 z M 20,23 l 1,0 0,1 -1,0 z M 21,23 l 1,0 0,1 -1,0 z M 22,23 l 1,0 0,1 -1,0 z M 23,23 l 1,0 0,1 -1,0 z M 27,23 l 1,0 0,1 -1,0 z M 30,23 l 1,0 0,1 -1,0 z M 31,23 l 1,0 0,1 -1,0 z M 32,23 l 1,0 0,1 -1,0 z M 36,23 l 1,0 0,1 -1,0 z M 2,24 l 1,0 0,1 -1,0 z M 3,24 l 1,0 0,1 -1,0 z M 4,24 l 1,0 0,1 -1,0 z M 6,24 l 1,0 0,1 -1,0 z M 7,24 l 1,0 0,1 -1,0 z M 8,24 l 1,0 0,1 -1,0 z M 9,24 l 1,0 0,1 -1,0 z M 10,24 l 1,0 0,1 -1,0 z M 12,24 l 1,0 0,1 -1,0 z M 14,24 l 1,0 0,1 -1,0 z M 19,24 l 1,0 0,1 -1,0 z M 22,24 l 1,0 0,1 -1,0 z M 23,24 l 1,0 0,1 -1,0 z M 24,24 l 1,0 0,1 -1,0 z M 25,24 l 1,0 0,1 -1,0 z M 26,24 l 1,0 0,1 -1,0 z M 27,24 l 1,0 0,1 -1,0 z M 28,24 l 1,0 0,1 -1,0 z M 29,24 l 1,0 0,1 -1,0 z M 30,24 l 1,0 0,1 -1,0 z M 32,24 l 1,0 0,1 -1,0 z M 33,24 l 1,0 0,1 -1,0 z M 34,24 l 1,0 0,1 -1,0 z M 35,24 l 1,0 0,1 -1,0 z M 36,24 l 1,0 0,1 -1,0 z M 0,25 l 1,0 0,1 -1,0 z M 1,25 l 1,0 0,1 -1,0 z M 2,25 l 1,0 0,1 -1,0 z M 4,25 l 1,0 0,1 -1,0 z M 16,25 l 1,0 0,1 -1,0 z M 18,25 l 1,0 0,1 -1,0 z M 19,25 l 1,0 0,1 -1,0 z M 20,25 l 1,0 0,1 -1,0 z M 21,25 l 1,0 0,1 -1,0 z M 22,25 l 1,0 0,1 -1,0 z M 23,25 l 1,0 0,1 -1,0 z M 24,25 l 1,0 0,1 -1,0 z M 25,25 l 1,0 0,1 -1,0 z M 28,25 l 1,0 0,1 -1,0 z M 29,25 l 1,0 0,1 -1,0 z M 33,25 l 1,0 0,1 -1,0 z M 34,25 l 1,0 0,1 -1,0 z M 35,25 l 1,0 0,1 -1,0 z M 0,26 l 1,0 0,1 -1,0 z M 3,26 l 1,0 0,1 -1,0 z M 4,26 l 1,0 0,1 -1,0 z M 5,26 l 1,0 0,1 -1,0 z M 6,26 l 1,0 0,1 -1,0 z M 7,26 l 1,0 0,1 -1,0 z M 9,26 l 1,0 0,1 -1,0 z M 11,26 l 1,0 0,1 -1,0 z M 12,26 l 1,0 0,1 -1,0 z M 15,26 l 1,0 0,1 -1,0 z M 21,26 l 1,0 0,1 -1,0 z M 22,26 l 1,0 0,1 -1,0 z M 24,26 l 1,0 0,1 -1,0 z M 25,26 l 1,0 0,1 -1,0 z M 26,26 l 1,0 0,1 -1,0 z M 27,26 l 1,0 0,1 -1,0 z M 28,26 l 1,0 0,1 -1,0 z M 30,26 l 1,0 0,1 -1,0 z M 32,26 l 1,0 0,1 -1,0 z M 35,26 l 1,0 0,1 -1,0 z M 36,26 l 1,0 0,1 -1,0 z M 0,27 l 1,0 0,1 -1,0 z M 2,27 l 1,0 0,1 -1,0 z M 5,27 l 1,0 0,1 -1,0 z M 10,27 l 1,0 0,1 -1,0 z M 11,27 l 1,0 0,1 -1,0 z M 14,27 l 1,0 0,1 -1,0 z M 15,27 l 1,0 0,1 -1,0 z M 18,27 l 1,0 0,1 -1,0 z M 20,27 l 1,0 0,1 -1,0 z M 21,27 l 1,0 0,1 -1,0 z M 23,27 l 1,0 0,1 -1,0 z M 24,27 l 1,0 0,1 -1,0 z M 26,27 l 1,0 0,1 -1,0 z M 27,27 l 1,0 0,1 -1,0 z M 28,27 l 1,0 0,1 -1,0 z M 36,27 l 1,0 0,1 -1,0 z M 0,28 l 1,0 0,1 -1,0 z M 4,28 l 1,0 0,1 -1,0 z M 5,28 l 1,0 0,1 -1,0 z M 6,28 l 1,0 0,1 -1,0 z M 7,28 l 1,0 0,1 -1,0 z M 11,28 l 1,0 0,1 -1,0 z M 15,28 l 1,0 0,1 -1,0 z M 16,28 l 1,0 0,1 -1,0 z M 17,28 l 1,0 0,1 -1,0 z M 22,28 l 1,0 0,1 -1,0 z M 24,28 l 1,0 0,1 -1,0 z M 25,28 l 1,0 0,1 -1,0 z M 26,28 l 1,0 0,1 -1,0 z M 28,28 l 1,0 0,1 -1,0 z M 29,28 l 1,0 0,1 -1,0 z M 30,28 l 1,0 0,1 -1,0 z M 31,28 l 1,0 0,1 -1,0 z M 32,28 l 1,0 0,1 -1,0 z M 34,28 l 1,0 0,1 -1,0 z M 8,29 l 1,0 0,1 -1,0 z M 12,29 l 1,0 0,1 -1,0 z M 13,29 l 1,0 0,1 -1,0 z M 14,29 l 1,0 0,1 -1,0 z M 16,29 l 1,0 0,1 -1,0 z M 17,29 l 1,0 0,1 -1,0 z M 18,29 l 1,0 0,1 -1,0 z M 19,29 l 1,0 0,1 -1,0 z M 20,29 l 1,0 0,1 -1,0 z M 21,29 l 1,0 0,1 -1,0 z M 23,29 l 1,0 0,1 -1,0 z M 27,29 l 1,0 0,1 -1,0 z M 28,29 l 1,0 0,1 -1,0 z M 32,29 l 1,0 0,1 -1,0 z M 0,30 l 1,0 0,1 -1,0 z M 1,30 l 1,0 0,1 -1,0 z M 2,30 l 1,0 0,1 -1,0 z M 3,30 l 1,0 0,1 -1,0 z M 4,30 l 1,0 0,1 -1,0 z M 5,30 l 1,0 0,1 -1,0 z M 6,30 l 1,0 0,1 -1,0 z M 8,30 l 1,0 0,1 -1,0 z M 9,30 l 1,0 0,1 -1,0 z M 13,30 l 1,0 0,1 -1,0 z M 14,30 l 1,0 0,1 -1,0 z M 15,30 l 1,0 0,1 -1,0 z M 16,30 l 1,0 0,1 -1,0 z M 17,30 l 1,0 0,1 -1,0 z M 20,30 l 1,0 0,1 -1,0 z M 21,30 l 1,0 0,1 -1,0 z M 22,30 l 1,0 0,1 -1,0 z M 25,30 l 1,0 0,1 -1,0 z M 28,30 l 1,0 0,1 -1,0 z M 30,30 l 1,0 0,1 -1,0 z M 32,30 l 1,0 0,1 -1,0 z M 33,30 l 1,0 0,1 -1,0 z M 35,30 l 1,0 0,1 -1,0 z M 36,30 l 1,0 0,1 -1,0 z M 0,31 l 1,0 0,1 -1,0 z M 6,31 l 1,0 0,1 -1,0 z M 9,31 l 1,0 0,1 -1,0 z M 10,31 l 1,0 0,1 -1,0 z M 12,31 l 1,0 0,1 -1,0 z M 13,31 l 1,0 0,1 -1,0 z M 15,31 l 1,0 0,1 -1,0 z M 19,31 l 1,0 0,1 -1,0 z M 20,31 l 1,0 0,1 -1,0 z M 21,31 l 1,0 0,1 -1,0 z M 22,31 l 1,0 0,1 -1,0 z M 26,31 l 1,0 0,1 -1,0 z M 28,31 l 1,0 0,1 -1,0 z M 32,31 l 1,0 0,1 -1,0 z M 35,31 l 1,0 0,1 -1,0 z M 36,31 l 1,0 0,1 -1,0 z M 0,32 l 1,0 0,1 -1,0 z M 2,32 l 1,0 0,1 -1,0 z M 3,32 l 1,0 0,1 -1,0 z M 4,32 l 1,0 0,1 -1,0 z M 6,32 l 1,0 0,1 -1,0 z M 8,32 l 1,0 0,1 -1,0 z M 12,32 l 1,0 0,1 -1,0 z M 14,32 l 1,0 0,1 -1,0 z M 15,32 l 1,0 0,1 -1,0 z M 17,32 l 1,0 0,1 -1,0 z M 19,32 l 1,0 0,1 -1,0 z M 22,32 l 1,0 0,1 -1,0 z M 24,32 l 1,0 0,1 -1,0 z M 25,32 l 1,0 0,1 -1,0 z M 27,32 l 1,0 0,1 -1,0 z M 28,32 l 1,0 0,1 -1,0 z M 29,32 l 1,0 0,1 -1,0 z M 30,32 l 1,0 0,1 -1,0 z M 31,32 l 1,0 0,1 -1,0 z M 32,32 l 1,0 0,1 -1,0 z M 33,32 l 1,0 0,1 -1,0 z M 34,32 l 1,0 0,1 -1,0 z M 36,32 l 1,0 0,1 -1,0 z M 0,33 l 1,0 0,1 -1,0 z M 2,33 l 1,0 0,1 -1,0 z M 3,33 l 1,0 0,1 -1,0 z M 4,33 l 1,0 0,1 -1,0 z M 6,33 l 1,0 0,1 -1,0 z M 8,33 l 1,0 0,1 -1,0 z M 10,33 l 1,0 0,1 -1,0 z M 16,33 l 1,0 0,1 -1,0 z M 18,33 l 1,0 0,1 -1,0 z M 19,33 l 1,0 0,1 -1,0 z M 21,33 l 1,0 0,1 -1,0 z M 22,33 l 1,0 0,1 -1,0 z M 23,33 l 1,0 0,1 -1,0 z M 25,33 l 1,0 0,1 -1,0 z M 29,33 l 1,0 0,1 -1,0 z M 30,33 l 1,0 0,1 -1,0 z M 32,33 l 1,0 0,1 -1,0 z M 33,33 l 1,0 0,1 -1,0 z M 34,33 l 1,0 0,1 -1,0 z M 35,33 l 1,0 0,1 -1,0 z M 36,33 l 1,0 0,1 -1,0 z M 0,34 l 1,0 0,1 -1,0 z M 2,34 l 1,0 0,1 -1,0 z M 3,34 l 1,0 0,1 -1,0 z M 4,34 l 1,0 0,1 -1,0 z M 6,34 l 1,0 0,1 -1,0 z M 8,34 l 1,0 0,1 -1,0 z M 9,34 l 1,0 0,1 -1,0 z M 11,34 l 1,0 0,1 -1,0 z M 12,34 l 1,0 0,1 -1,0 z M 15,34 l 1,0 0,1 -1,0 z M 17,34 l 1,0 0,1 -1,0 z M 18,34 l 1,0 0,1 -1,0 z M 26,34 l 1,0 0,1 -1,0 z M 27,34 l 1,0 0,1 -1,0 z M 28,34 l 1,0 0,1 -1,0 z M 31,34 l 1,0 0,1 -1,0 z M 33,34 l 1,0 0,1 -1,0 z M 35,34 l 1,0 0,1 -1,0 z M 36,34 l 1,0 0,1 -1,0 z M 0,35 l 1,0 0,1 -1,0 z M 6,35 l 1,0 0,1 -1,0 z M 8,35 l 1,0 0,1 -1,0 z M 9,35 l 1,0 0,1 -1,0 z M 10,35 l 1,0 0,1 -1,0 z M 11,35 l 1,0 0,1 -1,0 z M 14,35 l 1,0 0,1 -1,0 z M 16,35 l 1,0 0,1 -1,0 z M 20,35 l 1,0 0,1 -1,0 z M 21,35 l 1,0 0,1 -1,0 z M 22,35 l 1,0 0,1 -1,0 z M 23,35 l 1,0 0,1 -1,0 z M 26,35 l 1,0 0,1 -1,0 z M 27,35 l 1,0 0,1 -1,0 z M 28,35 l 1,0 0,1 -1,0 z M 29,35 l 1,0 0,1 -1,0 z M 31,35 l 1,0 0,1 -1,0 z M 36,35 l 1,0 0,1 -1,0 z M 0,36 l 1,0 0,1 -1,0 z M 1,36 l 1,0 0,1 -1,0 z M 2,36 l 1,0 0,1 -1,0 z M 3,36 l 1,0 0,1 -1,0 z M 4,36 l 1,0 0,1 -1,0 z M 5,36 l 1,0 0,1 -1,0 z M 6,36 l 1,0 0,1 -1,0 z M 8,36 l 1,0 0,1 -1,0 z M 10,36 l 1,0 0,1 -1,0 z M 11,36 l 1,0 0,1 -1,0 z M 17,36 l 1,0 0,1 -1,0 z M 18,36 l 1,0 0,1 -1,0 z M 20,36 l 1,0 0,1 -1,0 z M 22,36 l 1,0 0,1 -1,0 z M 25,36 l 1,0 0,1 -1,0 z M 26,36 l 1,0 0,1 -1,0 z M 29,36 l 1,0 0,1 -1,0 z M 31,36 l 1,0 0,1 -1,0 z M 34,36 l 1,0 0,1 -1,0 z M 35,36 l 1,0 0,1 -1,0 z M 36,36 l 1,0 0,1 -1,0 z " /> </g> </svg>
+                </div>
+              </div>
+
+              <!-- Подпись под QR -->
+              <p class="text-xs sm:text-sm text-textSecondary font-medium mt-4 leading-relaxed max-w-xs mx-auto">
+                Открыли с компьютера? Наведите камеру телефона, чтобы сразу скачать APK
+              </p>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- БЛОК 3. КОРОТКО О ГЛАВНОМ (4 ВЕЛНЕС-КАРТОЧКИ)             -->
+    <!-- ======================================================== -->
+    <section class="py-14 sm:py-20 bg-gradient-to-b from-emerald-50/70 via-green-50/40 to-emerald-50/80 backdrop-blur-sm border-y border-cardBorder/80 relative">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Заголовок секции -->
+        <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-16 reveal-item">
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-textHeadline tracking-tight">
+            Коротко о главном
+          </h2>
+          <p class="text-sm sm:text-lg text-textSecondary mt-3">
+            Продуманный велнес-интерфейс без лишней суеты — только то, что важно вашему здоровью.
+          </p>
+        </div>
+
+        <!-- Сетка 2x2 на ПК и 1 колонка на мобильных -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 lg:gap-8">
+          
+          <!-- Карточка 1: Календарь планов -->
+          <article class="wellness-card rounded-24 p-6 sm:p-8 flex flex-col items-start reveal-item group">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-green-200 text-emerald-700 flex items-center justify-center mb-5 sm:mb-6 border border-emerald-300/70 transition-transform duration-300 group-hover:scale-105 shadow-sm shadow-emerald-500/10">
+              <!-- Calendar icon -->
+              <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l2 2m0 0l-2 2m2-2h-4" />
+              </svg>
+            </div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-textHeadline mb-2">
+              Календарь планов
+            </h3>
+            <p class="text-textSecondary leading-relaxed text-sm sm:text-base">
+              Календарь планов на любой горизонт: от диспансеризации на 2 года вперед до почасового приема лекарств.
+            </p>
+          </article>
+
+          <!-- Карточка 2: Умная медкарта -->
+          <article class="wellness-card rounded-24 p-6 sm:p-8 flex flex-col items-start reveal-item group">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-green-200 text-emerald-700 flex items-center justify-center mb-5 sm:mb-6 border border-emerald-300/70 transition-transform duration-300 group-hover:scale-105 shadow-sm shadow-emerald-500/10">
+              <!-- Medical folder / tags / document icon -->
+              <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9V3" />
+              </svg>
+            </div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-textHeadline mb-2">
+              Умная медкарта
+            </h3>
+            <p class="text-textSecondary leading-relaxed text-sm sm:text-base">
+              Храните выписки, анализы и фото бланков по папкам и #тегам с переводом назначений в напоминалку в 1 касание.
+            </p>
+          </article>
+
+          <!-- Карточка 3: Точная аптечка -->
+          <article class="wellness-card rounded-24 p-6 sm:p-8 flex flex-col items-start reveal-item group">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-green-200 text-emerald-700 flex items-center justify-center mb-5 sm:mb-6 border border-emerald-300/70 transition-transform duration-300 group-hover:scale-105 shadow-sm shadow-emerald-500/10">
+              <!-- Pill & Alarm notification icon -->
+              <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-textHeadline mb-2">
+              Точная аптечка
+            </h3>
+            <p class="text-textSecondary leading-relaxed text-sm sm:text-base">
+              Точные напоминалки для того, чтобы планировать прием лекарств: с привязкой к еде и отметками прямо из шторки уведомлений.
+            </p>
+          </article>
+
+          <!-- Карточка 4: Чекапы и семья -->
+          <article class="wellness-card rounded-24 p-6 sm:p-8 flex flex-col items-start reveal-item group">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-green-200 text-emerald-700 flex items-center justify-center mb-5 sm:mb-6 border border-emerald-300/70 transition-transform duration-300 group-hover:scale-105 shadow-sm shadow-emerald-500/10">
+              <!-- Family / Heart health checkup icon -->
+              <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-textHeadline mb-2">
+              Чекапы и семья
+            </h3>
+            <p class="text-textSecondary leading-relaxed text-sm sm:text-base">
+              Персональный график обследований по возрасту и полу с поддержкой профилей для близких.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- БЛОК 4. ПОНЯТНАЯ ИНСТРУКЦИЯ ПО УСТАНОВКЕ НА ANDROID      -->
+    <!-- ======================================================== -->
+    <section id="install-guide" class="py-14 sm:py-24 scroll-mt-20">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Заголовок блока установки -->
+        <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-16 reveal-item">
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-textHeadline tracking-tight">
+            Как установить PoraDoc на Android
+          </h2>
+          <p class="text-sm sm:text-lg text-textSecondary mt-3">
+            Приложение скачивается напрямую в открытом формате APK. Следуйте 3 простым шагам:
+          </p>
+        </div>
+
+        <!-- 3 шага установки (Карточки) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 mb-12 sm:mb-14">
+          
+          <!-- Шаг 1 -->
+          <div class="wellness-card rounded-24 p-6 sm:p-7 flex flex-col reveal-item relative overflow-hidden">
+            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white font-extrabold text-lg flex items-center justify-center mb-4 sm:mb-5 shadow-md shadow-emerald-600/30 ring-4 ring-emerald-100">
+              1
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-textHeadline mb-2 sm:mb-2.5">
+              Скачайте файл
+            </h3>
+            <p class="text-textSecondary text-xs sm:text-base leading-relaxed">
+              Нажмите кнопку «Скачать PoraDoc.apk» выше и дождитесь загрузки файла.
+            </p>
+          </div>
+
+          <!-- Шаг 2 -->
+          <div class="wellness-card rounded-24 p-6 sm:p-7 flex flex-col reveal-item relative overflow-hidden">
+            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white font-extrabold text-lg flex items-center justify-center mb-4 sm:mb-5 shadow-md shadow-emerald-600/30 ring-4 ring-emerald-100">
+              2
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-textHeadline mb-2 sm:mb-2.5">
+              Разрешите установку из браузера
+            </h3>
+            <p class="text-textSecondary text-xs sm:text-base leading-relaxed">
+              При открытии файла телефон спросит разрешение на установку из этого источника (Chrome / Проводник). Переключите тумблер «Разрешить для этого источника».
+            </p>
+          </div>
+
+          <!-- Шаг 3 -->
+          <div class="wellness-card rounded-24 p-6 sm:p-7 flex flex-col reveal-item relative overflow-hidden">
+            <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white font-extrabold text-lg flex items-center justify-center mb-4 sm:mb-5 shadow-md shadow-emerald-600/30 ring-4 ring-emerald-100">
+              3
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-textHeadline mb-2 sm:mb-2.5">
+              Обойдите стандартную проверку
+            </h3>
+            <p class="text-textSecondary text-xs sm:text-base leading-relaxed">
+              Если появится окно Google Play Защиты «Файл может быть опасным» (стандартная реакция на новые независимые приложения) — нажмите «Подробнее», а затем «Всё равно установить».
+            </p>
+          </div>
+
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- ИНТЕРАКТИВНЫЙ БЛОК-АККОРДЕОН ДЛЯ ЧАСТЫХ СИТУАЦИЙ         -->
+        <!-- ======================================================== -->
+        <div class="max-w-3xl mx-auto reveal-item">
+          
+          <div class="text-center mb-6">
+            <h3 class="text-xl sm:text-2xl font-bold text-textHeadline">
+              Частые вопросы и особенности смартфонов
+            </h3>
+            <p class="text-xs sm:text-sm text-textSecondary mt-1">
+              Нажмите на плашку, чтобы открыть подробное решение
+            </p>
+          </div>
+
+          <div class="space-y-3 sm:space-y-4" id="accordion-group">
+            
+            <!-- Плашка 1: Samsung (Автоблокировка) -->
+            <div class="wellness-card rounded-24 overflow-hidden">
+              <button type="button"
+                      class="accordion-header w-full px-5 sm:px-6 py-4.5 sm:py-5 text-left flex items-center justify-between gap-3 sm:gap-4 cursor-pointer focus:outline-none"
+                      aria-expanded="false"
+                      aria-controls="acc-content-1"
+                      id="acc-btn-1">
+                <span class="text-sm sm:text-base font-bold text-textHeadline leading-snug">
+                  Не нажимается кнопка «Установить» на Samsung (Автоблокировка)?
+                </span>
+                <svg class="accordion-chevron w-5 h-5 text-textSecondary flex-shrink-0 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <div id="acc-content-1" class="accordion-body" role="region" aria-labelledby="acc-btn-1">
+                <div class="accordion-wrapper">
+                  <div class="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 text-sm sm:text-base text-textSecondary leading-relaxed border-t border-emerald-200/60">
+                    <p>
+                      На смартфонах Samsung с оболочкой One UI 6+ (Android 14+) по умолчанию может быть активна функция «Автоблокировка» (Auto Blocker), которая блокирует установку приложений не из Galaxy Store или Play Market.
+                    </p>
+                    <p class="mt-2.5 p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-textHeadline font-medium text-xs sm:text-sm">
+                      <strong>Как отключить на время установки:</strong> откройте <span class="text-emerald-700 font-semibold">Настройки телефона → Безопасность и конфиденциальность → Автоблокировка</span> (или «Автоблокировщик») → временно переведите переключатель в положение «Выключено» (потребуется PIN-код или отпечаток), установите PoraDoc, после чего включите функцию обратно.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Плашка 2: Xiaomi / Redmi / POCO -->
+            <div class="wellness-card rounded-24 overflow-hidden">
+              <button type="button"
+                      class="accordion-header w-full px-5 sm:px-6 py-4.5 sm:py-5 text-left flex items-center justify-between gap-3 sm:gap-4 cursor-pointer focus:outline-none"
+                      aria-expanded="false"
+                      aria-controls="acc-content-2"
+                      id="acc-btn-2">
+                <span class="text-sm sm:text-base font-bold text-textHeadline leading-snug">
+                  Предупреждение безопасности на Xiaomi / Redmi / POCO (HyperOS / MIUI)?
+                </span>
+                <svg class="accordion-chevron w-5 h-5 text-textSecondary flex-shrink-0 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <div id="acc-content-2" class="accordion-body" role="region" aria-labelledby="acc-btn-2">
+                <div class="accordion-wrapper">
+                  <div class="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 text-sm sm:text-base text-textSecondary leading-relaxed border-t border-emerald-200/60">
+                    <p>
+                      При открытии APK через браузер или проводник оболочка HyperOS / MIUI отображает предупреждение безопасности со встроенным 10-секундным таймером.
+                    </p>
+                    <p class="mt-2.5 p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-textHeadline font-medium text-xs sm:text-sm">
+                      <strong>Что сделать:</strong> дождитесь завершения 10-секундного отсчета, установите галочку «Я осознаю возможные риски» и нажмите <strong class="text-emerald-700 font-bold">«ОК»</strong> (или «Разрешить / Установить»). Это стандартная проверка безопасности Xiaomi для независимых APK.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Плашка 3: Где хранятся данные -->
+            <div class="wellness-card rounded-24 overflow-hidden">
+              <button type="button"
+                      class="accordion-header w-full px-5 sm:px-6 py-4.5 sm:py-5 text-left flex items-center justify-between gap-3 sm:gap-4 cursor-pointer focus:outline-none"
+                      aria-expanded="false"
+                      aria-controls="acc-content-3"
+                      id="acc-btn-3">
+                <span class="text-sm sm:text-base font-bold text-textHeadline leading-snug">
+                  Где хранятся мои медицинские данные?
+                </span>
+                <svg class="accordion-chevron w-5 h-5 text-textSecondary flex-shrink-0 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <div id="acc-content-3" class="accordion-body" role="region" aria-labelledby="acc-btn-3">
+                <div class="accordion-wrapper">
+                  <div class="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 text-sm sm:text-base text-textSecondary leading-relaxed border-t border-emerald-200/60">
+                    <p>
+                      PoraDoc работает по принципу <strong class="text-textHeadline font-bold">Local-First</strong>. Ваши выписки, назначения, фото бланков и расписания хранятся исключительно в памяти вашего смартфона (база данных Room) и никуда не передаются. В настройках профиля вы можете в любой момент создать резервную копию и выгрузить полный ZIP-архив своей медкарты.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- БЛОК 5. ПОДВАЛ САЙТА (FOOTER)                            -->
+  <!-- ======================================================== -->
+  <footer class="bg-gradient-to-b from-white/80 via-emerald-50/60 to-emerald-100/80 border-t border-cardBorder py-10 sm:py-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 pb-8 border-b border-cardBorder/80">
+        
+        <!-- Логотип и краткое описание -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-3.5 text-center sm:text-left">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white shadow-sm shadow-emerald-500/25 flex-shrink-0">
+            <svg class="w-6 h-6 text-white" viewBox="0 0 108 108" fill="none" stroke="currentColor">
+              <path stroke="#DCFCE7" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" d="M54,23 C68,23 81,32 81,50 C81,66 54,85 54,85 C54,85 27,66 27,50 C27,32 40,23 54,23 Z" />
+              <path fill="#FFFFFF" stroke="none" d="M50,37 C50,34.8 51.8,33 54,33 C56.2,33 58,34.8 58,37 L58,47 L68,47 C70.2,47 72,48.8 72,51 C72,53.2 70.2,55 68,55 L58,55 L58,65 C58,67.2 56.2,69 54,69 C51.8,69 50,67.2 50,65 L50,55 L40,55 C37.8,55 36,53.2 36,51 C36,48.8 37.8,47 40,47 L50,47 Z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center justify-center sm:justify-start gap-2">
+              <span class="text-xl font-extrabold text-textHeadline">PoraDoc</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200">v1.0</span>
+            </div>
+            <p class="text-xs sm:text-sm text-textSecondary mt-0.5">
+              Персональный органайзер здоровья
+            </p>
+          </div>
+        </div>
+
+        <!-- Ссылки репозитория и версий -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm font-semibold w-full sm:w-auto">
+          <a href="https://github.com/hydroimperium/poradoc-web"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-white/90 hover:bg-emerald-50 text-emerald-950 border border-cardBorder hover:border-emerald-300 transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto text-center shadow-sm">
+            <!-- GitHub icon -->
+            <svg class="w-4 h-4 fill-current flex-shrink-0" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            <span>Открытый репозиторий релиза на GitHub</span>
+          </a>
+
+          <a href="https://github.com/hydroimperium/poradoc-web/releases"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full text-emerald-800 hover:text-emerald-950 hover:bg-emerald-100/70 border border-transparent hover:border-emerald-200 transition-all duration-200 w-full sm:w-auto text-center">
+            <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <span>Все версии (Releases)</span>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Копирайт и локальные инварианты -->
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-textSecondary text-center sm:text-left">
+        <p>© 2026 PoraDoc. 100% Local-First архитектура — данные не покидают смартфон.</p>
+        <p>Требования: Android 8.0+ (API 26+) • 100% Local-First • Без трекеров</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- ЧИСТЫЙ JAVASCRIPT: QR-КОД, АККОРДЕОН, ПЛАВНЫЙ СКРОЛЛ    -->
+  <!-- ======================================================== -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      
+      // 1. ДИНАМИЧЕСКАЯ ГЕНЕРАЦИЯ QR-КОДА
+      const apkUrl = "https://github.com/hydroimperium/poradoc-web/releases/latest/download/PoraDoc.apk";
+      const qrContainer = document.getElementById("qrcode");
+      const qrSvg = document.getElementById("qr-svg");
+
+      if (window.QRCode && qrContainer) {
+        try {
+          const tempDiv = document.createElement("div");
+          new QRCode(tempDiv, {
+            text: apkUrl,
+            width: 176,
+            height: 176,
+            colorDark: "#0B2915",
+            colorLight: "#FFFFFF",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+
+          // If dynamically generated successfully, mount into container
+          setTimeout(() => {
+            const canvasOrImg = tempDiv.querySelector("canvas, img");
+            if (canvasOrImg) {
+              if (qrSvg) qrSvg.remove();
+              qrContainer.appendChild(tempDiv);
+            }
+          }, 30);
+        } catch (e) {
+          console.warn("QRCode initialization fallback to inline SVG:", e);
+        }
+      }
+
+      // 2. ИНТЕРАКТИВНЫЙ АККОРДЕОН
+      const accordionHeaders = document.querySelectorAll(".accordion-header");
+
+      accordionHeaders.forEach(button => {
+        button.addEventListener("click", function () {
+          const isExpanded = this.getAttribute("aria-expanded") === "true";
+          const body = this.nextElementSibling;
+          const chevron = this.querySelector(".accordion-chevron");
+
+          // Закрываем все остальные плашки для аккуратного велнес-вида
+          accordionHeaders.forEach(otherBtn => {
+            if (otherBtn !== button) {
+              otherBtn.setAttribute("aria-expanded", "false");
+              const otherBody = otherBtn.nextElementSibling;
+              const otherChevron = otherBtn.querySelector(".accordion-chevron");
+              if (otherBody) otherBody.classList.remove("open");
+              if (otherChevron) otherChevron.classList.remove("rotate-180");
+            }
+          });
+
+          // Переключаем текущую плашку
+          this.setAttribute("aria-expanded", String(!isExpanded));
+          if (!isExpanded) {
+            body.classList.add("open");
+            if (chevron) chevron.classList.add("rotate-180");
+          } else {
+            body.classList.remove("open");
+            if (chevron) chevron.classList.remove("rotate-180");
+          }
+        });
+      });
+
+      // 3. ПЛАВНОЕ ПОЯВЛЕНИЕ БЛОКОВ ПРИ СКРОЛЛЕ (INTERSECTION OBSERVER)
+      const revealItems = document.querySelectorAll(".reveal-item");
+
+      // Сразу отображаем элементы, находящиеся в пределах первого экрана
+      revealItems.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        if (rect.top < window.innerHeight) {
+          item.classList.add("is-revealed");
+        }
+      });
+
+      if ("IntersectionObserver" in window) {
+        const observerOptions = {
+          root: null,
+          rootMargin: "0px 0px -40px 0px",
+          threshold: 0.08
+        };
+
+        const observer = new IntersectionObserver((entries, obs) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-revealed");
+              obs.unobserve(entry.target);
+            }
+          });
+        }, observerOptions);
+
+        revealItems.forEach(item => {
+          if (!item.classList.contains("is-revealed")) {
+            observer.observe(item);
+          }
+        });
+      } else {
+        // Fallback для старых браузеров
+        revealItems.forEach(item => item.classList.add("is-revealed"));
+      }
+
+    });
+  </script>
+
+</body>
+</html>
