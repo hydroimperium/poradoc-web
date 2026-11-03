@@ -1,6 +1,6 @@
 # 🌿 PoraDoc — Персональный велнес-планер и семейная медкарта
 
-[![Version](https://img.shields.io/badge/Release-v1.0-16a34a.svg)](https://github.com/hydroimperium/poradoc-web/releases/latest)
+[![Version](https://img.shields.io/github/v/release/hydroimperium/poradoc-web?color=16a34a&label=Release)](https://github.com/hydroimperium/poradoc-web/releases/latest)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-blue.svg)](https://developer.android.com)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-emerald.svg)](#-приватность-и-безопасность)
 [![Website](https://img.shields.io/badge/Website-GitHub%20Pages-22c55e.svg)](https://hydroimperium.github.io/poradoc-web/)
@@ -14,7 +14,7 @@
 ## 🚀 Быстрый старт
 
 * 🌐 **Официальный сайт лендинг**: [hydroimperium.github.io/poradoc-web](https://hydroimperium.github.io/poradoc-web/)
-* 📲 **Прямая ссылка на скачивание APK**: [Скачать PoraDoc.apk (v1.0)](https://github.com/hydroimperium/poradoc-web/releases/latest/download/PoraDoc.apk)
+* 📲 **Прямая ссылка на скачивание APK**: [Скачать PoraDoc.apk](https://github.com/hydroimperium/poradoc-web/releases/latest/download/PoraDoc.apk)
 * 📋 **Все версии релиза**: [Страница Releases](https://github.com/hydroimperium/poradoc-web/releases)
 
 ---
